@@ -1,9 +1,6 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from 'next/font/google'
-import { Container, Box, Typography } from '@mui/material'
+import Head from 'next/head';
+import { Container, Box, Typography } from '@mui/material';
 
-const inter = Inter({ subsets: ['latin'] })
 export default function Home() {
   return (
     <>
@@ -23,5 +20,5 @@ export default function Home() {
         </Box>
       </Container>
     </>
-  )
+  );
 }

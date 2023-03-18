@@ -2,7 +2,7 @@ import '@/styles/globals.css'
 import React from 'react'
 import type { AppProps } from 'next/app'
 import theme from '@/config/theme'
-import { styled, createTheme, ThemeProvider } from '@mui/material/styles'
+import { styled, ThemeProvider } from '@mui/material/styles'
 import CssBaseline from '@mui/material/CssBaseline'
 import {
   AppBar as MuiAppBar,
@@ -38,7 +38,7 @@ function Copyright(props: any) {
     </Typography>
   )
 }
-const drawerWidth: number = 240
+const drawerWidth = 240
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean
 }
