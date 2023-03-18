@@ -1,9 +1,9 @@
-import '@/styles/globals.css'
-import React from 'react'
-import type { AppProps } from 'next/app'
-import theme from '@/config/theme'
-import { styled, ThemeProvider } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
+import '@/styles/globals.css';
+import React from 'react';
+import type { AppProps } from 'next/app';
+import theme from '@/config/theme';
+import { styled, ThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
 import {
   AppBar as MuiAppBar,
   Toolbar,
@@ -17,30 +17,26 @@ import {
   Container,
   Grid,
   Paper,
-} from '@mui/material'
-import type { AppBarProps as MuiAppBarProps } from '@mui/material'
+} from '@mui/material';
+import type { AppBarProps as MuiAppBarProps } from '@mui/material';
 import {
   Menu as MenuIcon,
   Notifications as NotificationsIcon,
   ChevronLeft as ChevronLeftIcon,
-} from '@mui/icons-material'
-function Copyright(props: any) {
+} from '@mui/icons-material';
+type Props<T extends (...args: any) => any> = Parameters<T>[0];
+function Copyright(prop: Props<typeof Typography>) {
   return (
-    <Typography
-      variant="body2"
-      color="text.secondary"
-      align="center"
-      {...props}
-    >
+    <Typography variant="body2" color="text.secondary" align="center" {...prop}>
       {'Copyright © '}
       {new Date().getFullYear()}
       {'.'}
     </Typography>
-  )
+  );
 }
-const drawerWidth = 240
+const drawerWidth = 240;
 interface AppBarProps extends MuiAppBarProps {
-  open?: boolean
+  open?: boolean;
 }
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -59,7 +55,7 @@ const AppBar = styled(MuiAppBar, {
       //   duration: theme.transitions.duration.enteringScreen,
       // }),
     }),
-}))
+}));
 const Drawer = styled(MuiDrawer, {
   shouldForwardProp: (prop) => prop !== 'open',
 })(({ theme, open }) => ({
@@ -85,12 +81,12 @@ const Drawer = styled(MuiDrawer, {
       },
     }),
   },
-}))
+}));
 export default function App({ Component, pageProps }: AppProps) {
-  const [open, setOpen] = React.useState(true)
+  const [open, setOpen] = React.useState(true);
   const toggleDrawer = () => {
-    setOpen(!open)
-  }
+    setOpen(!open);
+  };
   return (
     <ThemeProvider theme={theme}>
       <Box sx={{ display: 'flex' }}>
@@ -203,5 +199,5 @@ export default function App({ Component, pageProps }: AppProps) {
         </Box>
       </Box>
     </ThemeProvider>
-  )
+  );
 }

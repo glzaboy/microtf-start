@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "clear": "rimraf .next && rimraf node_modules",
+    "prisma db push": "prisma  db push",
+    "prisma format": "prisma  format",
+    "prisma generate": "prisma generate"
   },
   "dependencies": {
     "@emotion/react": "^11.10.6",
