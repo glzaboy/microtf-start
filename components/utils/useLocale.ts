@@ -5,6 +5,7 @@ import { useAppSelector, selectGlobal } from '@/modules/store';
  * @param locale 语言翻译文件
  * @returns 翻译项目
  */
+//eslint-disable-next-line
 function useLocale(locale: any = null): Record<string, string> {
   return getLocaleTable(locale, useLocaleName());
 }
@@ -18,7 +19,7 @@ export function useLocaleName(): 'zh-CN' | 'en-US' {
   return globalState.lang || 'zh-CN';
 }
 export function getLocaleTable(
-  locale: any = null,
+  locale: any, //eslint-disable-line
   lang: string
 ): Record<string, string> {
   if (locale) {

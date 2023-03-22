@@ -58,6 +58,7 @@ export const getLoginUser = (
   const cookieStr = req.cookies['auth'] ?? '';
   if (cookieStr !== null && cookieStr !== undefined && cookieStr.length > 0) {
     try {
+      //eslint-disable-next-line
       const verify: any = verifyJwt(cookieStr);
       if (verify) {
         ret.login = true;

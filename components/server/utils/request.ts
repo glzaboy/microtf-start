@@ -8,6 +8,7 @@ import type {
 import { isSSR } from './isSSR';
 import { getLocaleTable } from '@/components/utils/useLocale';
 // import { Message } from '@arco-design/web-react';
+import message from '@/components/base/Message';
 import requestLocale from '@/locale/request';
 let requestInstance: AxiosInstance;
 let config: AxiosRequestConfig;
@@ -44,8 +45,10 @@ interface IRequestOptions extends AxiosRequestConfig {
 }
 
 interface IRequest {
+  //eslint-disable-next-line
   <T = any>(url: string, opts: IRequestOptions): Promise<T>; // getResponse 默认是 false， 因此不提供该参数时，只返回 data
-  <T = any>(url: string): Promise<T>; // 不提供 opts 时，默认使用 'GET' method，并且默认返回 data
+  //eslint-disable-next-line
+  <T = any>(url: string): Promise<T>; // getResponse 默认是 false， 因此不提供该参数时，只返回 data
 }
 
 const request: IRequest = (
@@ -122,25 +125,26 @@ const requestMsg: IRequest = (
       .then((res) => {
         const data = res.data;
         if (data.code != 0) {
-          // dispatch(sendMsg({ msg: { message: data.msg, open: true } }));
-          // Message.error(data.msg);
+          data.msg &&
+            message.error({
+              message: data.msg,
+            });
           reject(data.msg);
+        } else {
+          data.msg &&
+            message.info({
+              message: data.msg,
+            });
         }
         resolve(res.data);
       })
       .catch((error: AxiosError) => {
         if (error.response) {
-          // dispatch(
-          //   sendMsg({
-          //     msg: {
-          //       message:
-          //         t['request.server.unavailable'] +
-          //         ' ' +
-          //         error.response.statusText,
-          //       open: true,
-          //     },
-          //   })
-          // );
+          message.error({
+            message:
+              t['request.server.unavailable'] + ' ' + error.response.statusText,
+          });
+
           reject(
             t['request.server.unavailable'] +
               error.response.status +
@@ -148,25 +152,14 @@ const requestMsg: IRequest = (
               error.response.statusText
           );
         } else if (error.request) {
-          // dispatch(
-          //   sendMsg({
-          //     msg: {
-          //       message:
-          //         t['request.server.network.error'] + ' ' + error.request,
-          //       open: true,
-          //     },
-          //   })
-          // );
+          message.error({
+            message: t['request.server.network.error'] + ' ' + error.request,
+          });
           reject(t['request.server.network.error'] + error.request);
         } else {
-          // dispatch(
-          //   sendMsg({
-          //     msg: {
-          //       message: t['request.server.retry'] + ' ' + error,
-          //       open: true,
-          //     },
-          //   })
-          // );
+          message.error({
+            message: t['request.server.retry'] + ' ' + error,
+          });
           reject(t['request.server.retry'] + error);
         }
       });
