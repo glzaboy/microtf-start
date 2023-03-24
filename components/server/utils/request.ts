@@ -7,7 +7,6 @@ import type {
 } from 'axios';
 import { isSSR } from './isSSR';
 import { getLocaleTable } from '@/components/utils/useLocale';
-// import { Message } from '@arco-design/web-react';
 import message from '@/components/base/Message';
 import requestLocale from '@/locale/request';
 let requestInstance: AxiosInstance;
@@ -125,25 +124,18 @@ const requestMsg: IRequest = (
       .then((res) => {
         const data = res.data;
         if (data.code != 0) {
-          data.msg &&
-            message.error({
-              message: data.msg,
-            });
+          data.msg && message.error(data.msg);
           reject(data.msg);
         } else {
-          data.msg &&
-            message.info({
-              message: data.msg,
-            });
+          data.msg && message.info(data.msg);
         }
         resolve(res.data);
       })
       .catch((error: AxiosError) => {
         if (error.response) {
-          message.error({
-            message:
-              t['request.server.unavailable'] + ' ' + error.response.statusText,
-          });
+          message.error(
+            t['request.server.unavailable'] + ' ' + error.response.statusText
+          );
 
           reject(
             t['request.server.unavailable'] +
@@ -152,14 +144,12 @@ const requestMsg: IRequest = (
               error.response.statusText
           );
         } else if (error.request) {
-          message.error({
-            message: t['request.server.network.error'] + ' ' + error.request,
-          });
+          message.error(
+            t['request.server.network.error'] + ' ' + error.request
+          );
           reject(t['request.server.network.error'] + error.request);
         } else {
-          message.error({
-            message: t['request.server.retry'] + ' ' + error,
-          });
+          message.error(t['request.server.retry'] + ' ' + error);
           reject(t['request.server.retry'] + error);
         }
       });

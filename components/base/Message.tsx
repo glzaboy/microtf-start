@@ -1,123 +1,120 @@
-import { Alert, Popover } from '@mui/material';
+import { Alert } from '@mui/material';
 import styled from '@emotion/styled';
-
-import { ReactNode, useEffect, useState } from 'react';
-import ReactDOM from 'react-dom';
-import { createRoot, hydrateRoot } from 'react-dom/client';
-import type { Root } from 'react-dom/client';
-import theme from '@/config/theme';
 import { ThemeProvider } from '@mui/material/styles';
 
-const GlobalProver = styled(Popover)(() => ({
-  '.MuiPopover-root': {
-    position: 'unset',
-    display: 'none',
+import { ReactNode } from 'react';
+import { createRoot } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
+import theme from '@/config/theme';
+
+const MessageContainer = styled('div')(() => ({
+  width: '100%',
+  position: 'fixed',
+  zIndex: 3000,
+  padding: '0 10px',
+  textAlign: 'center',
+  pointerEvents: 'none',
+  boxSizing: 'border-box',
+  left: 0,
+  top: 0,
+  '& .MuiPaper-root': {
+    width: '50%',
+    margin: '2px auto',
+    pointerEvents: 'auto',
   },
 }));
-let root: Root;
-function notice(args: msgType) {
-  const div = document.getElementById('global');
-  if (!div) {
-    const div2 = document.createElement('div');
-    div2.setAttribute('id', 'global');
-    document.body.appendChild(div2);
-    root = createRoot(div2);
-  } else {
-  }
-  root.render(<Message {...args} />);
-}
-let timer: NodeJS.Timeout;
-type msgType = {
-  message: ReactNode;
-  severity?: 'success' | 'info' | 'warning' | 'error';
-  duration?: number;
-};
-function Message(props: msgType) {
-  const [msgs, setMsgs] = useState<Array<msgType>>([]);
-  const [open, setOpen] = useState<boolean>(false);
-  useEffect(() => {
-    setMsgs([...msgs, props]);
-  }, [props]);
-  useEffect(() => {
-    if (msgs.length) {
-      setOpen(true);
-      const msgs_copy = JSON.parse(JSON.stringify(msgs));
 
-      clearInterval(timer);
-      timer = setInterval(
-        (setMsgs1) => {
-          msgs_copy.shift();
-          setMsgs1(JSON.parse(JSON.stringify(msgs_copy)));
-          if (!msgs_copy.length) {
-            clearInterval(timer);
-          }
-        },
-        2 * 1000,
-        setMsgs
-      );
-    } else {
-      setOpen(false);
-    }
-    console.log(msgs);
-  }, [msgs, props]);
+// Message 组件
+function Message(props: messageQueueItem) {
+  const { type, message, id } = props;
   return (
-    <>
-      {msgs && (
-        <ThemeProvider theme={theme}>
-          <GlobalProver
-            style={{ position: 'unset' }}
-            open={open}
-            anchorOrigin={{
-              vertical: 'center',
-              horizontal: 'center',
-            }}
-            transformOrigin={{
-              vertical: 'center',
-              horizontal: 'center',
-            }}
-          >
-            {msgs.map((item, index) => {
-              return (
-                <Alert
-                  severity={item.severity}
-                  sx={{ m: 0, width: '100%', boxShadow: 1 }}
-                  key={index}
-                >
-                  {item.message}
-                  {item.severity}
-                </Alert>
-              );
-            })}
-          </GlobalProver>
-        </ThemeProvider>
-      )}
-    </>
+    <Alert
+      severity={type}
+      onClose={() => {
+        removeMessage(id);
+      }}
+      style={{ width: '50%' }}
+    >
+      {message}
+    </Alert>
   );
 }
-const api = {
-  info: (args: msgType): void => {
-    args.severity = 'info';
-    args.duration = args.duration ?? 3;
-    console.log(args);
-    return notice(args);
-  },
-  error: (args: msgType): void => {
-    args.severity = 'error';
-    args.duration = args.duration ?? 3;
-    console.log(args);
-    return notice(args);
-  },
-  warn: (args: msgType): void => {
-    args.severity = 'warning';
-    args.duration = args.duration ?? 3;
-    console.log(args);
-    return notice(args);
-  },
-  success: (args: msgType): void => {
-    args.severity = 'success';
-    args.duration = args.duration ?? 3;
-    console.log(args);
-    return notice(args);
-  },
+
+const CONTAINER_ID = 'global_message';
+
+type messageType = 'success' | 'info' | 'warning' | 'error';
+type messageInput = (message: string | ReactNode) => void;
+interface messageOption {
+  type?: messageType;
+  message: string | ReactNode;
+}
+interface messageQueueItem extends messageOption {
+  id: string;
+}
+interface propsMessage {
+  info: messageInput;
+  warn: messageInput;
+  error: messageInput;
+  success: messageInput;
+}
+
+export type { propsMessage, messageOption, messageQueueItem };
+function uuid() {
+  const uuid = window.crypto.getRandomValues(new Uint8Array(8));
+
+  return uuid.toString().split(',').join('');
+}
+const messageQueue: Array<messageQueueItem> = [];
+// 新增消息
+function addMessage(params: messageOption) {
+  const id = uuid();
+  messageQueue.push({ ...params, id });
+  setTimeout(() => {
+    removeMessage(id);
+  }, 3000);
+  renderMessage([...messageQueue]);
+}
+
+// 移除消息
+function removeMessage(id: string) {
+  const position = messageQueue.findIndex((item) => item.id === id);
+  messageQueue.splice(position, 1);
+  renderMessage([...messageQueue]);
+}
+let containerRoot: Root;
+function renderMessage(messageQueue: Array<messageQueueItem>) {
+  const container = createContainer();
+  if (!containerRoot) {
+    containerRoot = createRoot(container);
+  }
+
+  const MessageComponents = messageQueue.map((props) => {
+    return <Message {...props} key={props.id} />;
+  });
+  const MessageRender = (
+    <ThemeProvider theme={theme}>
+      <MessageContainer>{MessageComponents}</MessageContainer>
+    </ThemeProvider>
+  );
+  containerRoot.render(MessageRender);
+}
+function createContainer() {
+  let container = document.getElementById(CONTAINER_ID);
+  if (!container) {
+    container = document.createElement('div');
+    container.setAttribute('id', CONTAINER_ID);
+    document.body.appendChild(container);
+  }
+  return container;
+}
+const api: propsMessage = {
+  info: (message: string | ReactNode) => addMessage({ type: 'info', message }),
+  warn: (message: string | ReactNode) =>
+    addMessage({ type: 'warning', message }),
+  error: (message: string | ReactNode) =>
+    addMessage({ type: 'error', message }),
+  success: (message: string | ReactNode) =>
+    addMessage({ type: 'success', message }),
 };
+
 export default api;
