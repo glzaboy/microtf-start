@@ -23,7 +23,7 @@ export default function Home({
       <Head>
         <title>{'microtf'}</title>
       </Head>
-      <Container maxWidth="xl">
+      <Container maxWidth="lg">
         <Grid container spacing={2}>
           {data.categories &&
             data.categories.map((value) => {
@@ -37,13 +37,10 @@ export default function Home({
                           return (
                             <ListItem key={post.post.id}>
                               <WebLink
-                                // handleClick={() => alert(1)}
-                                query={{ id: post.post.id }}
-                                pathname="/blog/view/[id]"
+                                confirmText="hhhl"
+                                handleClick={() => alert(1)}
                                 link={{
                                   underline: 'hover',
-                                  // color: 'seashell',
-                                  // variant: 'button',
                                 }}
                               >
                                 {post.post.title}

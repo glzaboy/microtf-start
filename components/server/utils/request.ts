@@ -61,7 +61,7 @@ const request: IRequest = (
       if (process.env.PORT !== undefined) {
         url = 'http://localhost:' + process.env.PORT + '/' + url;
       } else {
-        url = 'http://localhost/' + url;
+        url = 'http://localhost:3000/' + url;
       }
     }
     if (opts.withCookie) {
