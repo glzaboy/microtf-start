@@ -28,7 +28,7 @@ export default function Home({
           {data.categories &&
             data.categories.map((value) => {
               return (
-                <Grid item={true} key={value.id} sm={12} lg={4} md={6}>
+                <Grid item={true} key={value.id} sm={6} xs={12} lg={4} md={4}>
                   <Card>
                     <CardContent>
                       <Typography>{value.cat}</Typography>
