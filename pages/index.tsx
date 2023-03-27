@@ -37,13 +37,10 @@ export default function Home({
                           return (
                             <ListItem key={post.post.id}>
                               <WebLink
-                                // handleClick={() => alert(1)}
                                 query={{ id: post.post.id }}
                                 pathname="/blog/view/[id]"
                                 link={{
                                   underline: 'hover',
-                                  // color: 'seashell',
-                                  // variant: 'button',
                                 }}
                               >
                                 {post.post.title}

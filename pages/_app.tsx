@@ -6,9 +6,9 @@ import { ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import { Provider } from 'react-redux';
 import store from '@/modules/store';
-
 import type { NextPage } from 'next';
 
+//eslint-disable-next-line
 export type NextPageWithLayout<P = {}, IP = P> = NextPage<P, IP> & {
   Layout?: ({ children }: { children: ReactNode }) => ReactElement<any, any>;
 };

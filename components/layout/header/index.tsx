@@ -1,12 +1,4 @@
-import {
-  Typography,
-  IconButton,
-  Stack,
-  Toolbar,
-  Button,
-  Container,
-  Box,
-} from '@mui/material';
+import { IconButton, Toolbar, Button, Container, Box } from '@mui/material';
 import logo from '@/public/logo.svg';
 import Image from 'next/image';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';

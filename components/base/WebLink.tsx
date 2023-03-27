@@ -9,8 +9,7 @@ import {
 } from '@mui/material';
 import { ReactNode, useState } from 'react';
 import { ParsedUrlQueryInput } from 'node:querystring';
-import type { TypographyProps, LinkProps } from '@mui/material';
-import HelpIcon from '@mui/icons-material/Help';
+import type { LinkProps } from '@mui/material';
 import { useRouter } from 'next/router';
 
 const WebLink = ({
@@ -30,14 +29,11 @@ const WebLink = ({
 }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
 
   const handleClose = () => {
     setOpen(false);
   };
-  //
+
   console.log(link);
   if (confirmText) {
     return (
