@@ -3,6 +3,7 @@ import logo from '@/public/logo.svg';
 import Image from 'next/image';
 import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
 import SettingsIcon from '@mui/icons-material/Settings';
+import WebLink from '@/components/base/WebLink';
 
 const Header = () => {
   return (
@@ -27,15 +28,21 @@ const Header = () => {
             <HomeOutlinedIcon />
           </IconButton>
           <Box component={'span'}>
-            <Image src={logo} alt={''} />
+            <Image
+              src={logo}
+              alt={''}
+              width={24}
+              height={24}
+              style={{ verticalAlign: 'middle', cursor: 'pointer' }}
+            />
           </Box>
-          {/* <Typography component={'span'} sx={{ alignContent: 'center' }}>
-            <span>{'Microtf'}</span>
-          </Typography> */}
-          <Box component={'span'}>
-            <Button size="small">首页</Button>
-            <Button size="medium">博客</Button>
-            <Button size="large">关于</Button>
+          <Box component={'span'} sx={{ pl: 2 }}>
+            <WebLink pathname="/" link={{ underline: 'none' }}>
+              <Button size="medium">首页</Button>
+            </WebLink>
+            <WebLink pathname="/" link={{ underline: 'none' }}>
+              <Button size="large">关于</Button>
+            </WebLink>
           </Box>
           <Box component={'span'} sx={{ float: 'right' }}>
             <IconButton

@@ -17,7 +17,7 @@ import WebLink from '@/components/base/WebLink';
 export default function Home({
   data,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  console.log(data.categories);
+  // console.log(data.categories);
   return (
     <>
       <Head>
@@ -31,7 +31,15 @@ export default function Home({
                 <Grid item={true} key={value.id} sm={6} xs={12} lg={4} md={4}>
                   <Card>
                     <CardContent>
-                      <Typography>{value.cat}</Typography>
+                      <Typography>
+                        <WebLink
+                          pathname="/blog/category/[id]/[page]"
+                          query={{ id: value.cat, page: 1 }}
+                          link={{ underline: 'hover' }}
+                        >
+                          {value.cat}
+                        </WebLink>
+                      </Typography>
                       <List>
                         {value.posts.map((post) => {
                           return (

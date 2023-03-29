@@ -25,7 +25,7 @@ const WebLink = ({
   query?: string | null | ParsedUrlQueryInput | undefined;
   handleClick?: () => void;
   confirmText?: string;
-  link: LinkProps;
+  link?: LinkProps;
 }) => {
   const router = useRouter();
   const [open, setOpen] = useState(false);
@@ -34,7 +34,6 @@ const WebLink = ({
     setOpen(false);
   };
 
-  console.log(link);
   if (confirmText) {
     return (
       <>
