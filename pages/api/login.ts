@@ -10,8 +10,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<response>
 ) {
-  const { type, userName, password } = req.body;
-  const loginP: LoginParament = { user: userName, loginType: type, password };
+  const { loginType, userName, password } = req.body;
+  const loginP: LoginParament = {
+    user: userName,
+    loginType: loginType,
+    password,
+  };
   login(loginP)
     .then((loginUser) => {
       setCookie(
@@ -27,6 +31,7 @@ export default async function handler(
       res.status(200).json({ code: 0, msg: '' });
     })
     .catch((error: Error) => {
+      console.log(error);
       res.status(200).json({ code: -1, msg: '失败' + error.message });
     });
 }
