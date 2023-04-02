@@ -1,18 +1,29 @@
-import { LayoutDefault } from '@/components/Layout';
+import { Layout } from '@/components/layout';
 import Head from 'next/head';
-import { Grid, List, Card, Space, Select } from '@arco-design/web-react';
+import {
+  Grid,
+  List,
+  ListItem,
+  Card,
+  CardContent,
+  Select,
+  InputLabel,
+  FormControl,
+  MenuItem,
+  Stack,
+  Container,
+} from '@mui/material';
 import formLocale from '@/locale/form';
 import postLocale from '@/locale/post';
-import useLocale, { useLocaleName } from '@/utils/useLocale';
-import styles from '@/pages/post/style/index.module.less';
+import useLocale, { useLocaleName } from '@/components/utils/useLocale';
 import { useCallback, useEffect, useState } from 'react';
 import type { Post, Category } from '@prisma/client';
-import { requestMsg } from '@/utils/request';
+import { requestMsg } from '@/components/server/utils/request';
 import type { Data } from '@/pages/api/post/list';
-import { IconPlus } from '@arco-design/web-react/icon';
-import cs from 'classnames';
+import AddIcon from '@mui/icons-material/Add';
 import WebLink from '@/components/base/WebLink';
 import type { Data as CatData } from '@/pages/api/post/categories/list';
+import type { SelectChangeEvent } from '@mui/material';
 
 export default function Index() {
   const postL = useLocale(postLocale);
@@ -68,71 +79,55 @@ export default function Index() {
         />
         <title>{postL['post.list']}</title>
       </Head>
-      <Card>
-        <Grid.Row gutter={{ xs: 4, sm: 6, md: 12 }}>
-          <Grid.Col span={24}>
-            <div
-              className={cs(styles['line_action'], styles['main_background'])}
-            >
-              <Space>
+      <Container maxWidth="xl">
+        <Card>
+          <Grid>
+            <Grid item={true} xs={12}>
+              <FormControl sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="cat_select">Age</InputLabel>
                 <Select
+                  // label={postL['post.list.catSel']}
+                  id="cat_select"
+                  label="Age"
                   placeholder={postL['post.list.catSel']}
-                  style={{ width: '250px' }}
-                  allowClear
-                  onChange={(value, option) => {
-                    console.log(option);
-                    console.log(value);
-                    setCatId(value);
+                  onChange={(event: SelectChangeEvent) => {
+                    console.log(event);
+                    setCatId(parseInt(event.target.value));
                     setPage(1);
                   }}
+                  variant="standard"
                 >
                   {categories &&
                     categories.map((value) => {
                       return (
-                        <Select.Option value={value.id} key={value.id}>
+                        <MenuItem value={value.id} key={value.id}>
                           {value.cat}
-                        </Select.Option>
+                        </MenuItem>
                       );
                     })}
                 </Select>
-              </Space>
-              <Space>
-                <WebLink pathname="/post/edit/0">
-                  <IconPlus />
-                  {formL['new']}
-                </WebLink>
-              </Space>
-            </div>
-          </Grid.Col>
-          <Grid.Col md={24} xs={24} sm={24}>
-            <div className={styles.content}>
+              </FormControl>
+              <WebLink pathname="/admin/post/edit/0">
+                <AddIcon />
+                {formL['new']}
+              </WebLink>
+            </Grid>
+            <Grid item={true} xs={12}>
               <Card>
-                <List
-                  pagination={{
-                    total,
-                    showTotal: true,
-                    onChange: (page) => {
-                      setPage(page);
-                    },
-                    showJumper: true,
-                    pageSize: 10,
-                    current: page,
-                  }}
-                  dataSource={data}
-                  render={(item, index) => {
-                    return (
-                      <List.Item key={index}>
-                        <div className={styles['line']}>
-                          <Space>{item.title}</Space>
-                          <Space>
+                <CardContent>
+                  <List>
+                    {data &&
+                      data.map((item, index) => (
+                        <ListItem key={index}>
+                          <Stack direction={'row'}>
+                            {item.title}
                             <WebLink
-                              pathname="/post/edit/[id]"
+                              pathname="/admin/post/edit/[id]"
                               query={{ id: item.id }}
                             >
                               {formL['edit']}
                             </WebLink>
                             <WebLink
-                              status="warning"
                               confirmText={formL['delete.confirm']}
                               handleClick={() => {
                                 requestMsg<Data>('/api/post/delete', {
@@ -143,18 +138,17 @@ export default function Index() {
                             >
                               {formL['delete']}
                             </WebLink>
-                          </Space>
-                        </div>
-                      </List.Item>
-                    );
-                  }}
-                ></List>
+                          </Stack>
+                        </ListItem>
+                      ))}
+                  </List>
+                </CardContent>
               </Card>
-            </div>
-          </Grid.Col>
-        </Grid.Row>
-      </Card>
+            </Grid>
+          </Grid>
+        </Card>
+      </Container>
     </>
   );
 }
-Index.Layout = LayoutDefault;
+Index.Layout = Layout;

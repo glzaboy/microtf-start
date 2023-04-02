@@ -136,14 +136,14 @@ const WangEditor = ({ html, setHtml, lang }: WangEditorProp) => {
   return (
     <>
       <div>
-        <Affix offsetTop={0}>
-          <Toolbar
-            editor={editor}
-            defaultConfig={isSmallScreen ? mobilebarConfig : fullToolConfig}
-            mode="default"
-            style={{ borderBottom: '1px solid #ccc' }}
-          />
-        </Affix>
+        {/* <Affix offsetTop={0}> */}
+        <Toolbar
+          editor={editor}
+          defaultConfig={isSmallScreen ? mobilebarConfig : fullToolConfig}
+          mode="default"
+          style={{ borderBottom: '1px solid #ccc' }}
+        />
+        {/* </Affix> */}
 
         <Editor
           defaultConfig={editorConfig}

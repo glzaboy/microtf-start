@@ -7,6 +7,12 @@ import type { CategoriesOnPosts } from '@prisma/client';
 export type Data = {
   id: number;
 } & response;
+export type InputDate = {
+  id?: number;
+  categoryId?: number[];
+  content: string;
+  title: string;
+};
 
 export default async function handler(
   req: NextApiRequest,
@@ -14,17 +20,7 @@ export default async function handler(
 ) {
   getLoginUser(req, { reqLogin: true })
     .then((user) => {
-      const {
-        id,
-        categoryId,
-        content,
-        title,
-      }: {
-        id?: number;
-        categoryId?: number[];
-        content: string;
-        title: string;
-      } = req.body;
+      const { id, categoryId, content, title }: InputDate = req.body;
       console.log(req.body);
       if (id) {
         prisma.$transaction(async (tx) => {

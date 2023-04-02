@@ -43,6 +43,7 @@ const WebLink = ({
             e.preventDefault();
             setOpen(true);
           }}
+          style={{ cursor: 'pointer' }}
         >
           {children}
         </MuiLink>
@@ -88,6 +89,7 @@ const WebLink = ({
           handleClick();
         }}
         component="span"
+        style={{ cursor: 'pointer' }}
       >
         {children}
       </MuiLink>
@@ -99,7 +101,7 @@ const WebLink = ({
           pathname,
           query,
         }}
-        style={{ color: 'unset', textDecoration: 'none' }}
+        style={{ color: 'unset', textDecoration: 'none', cursor: 'pointer' }}
       >
         <MuiLink {...link} component="span">
           {children}

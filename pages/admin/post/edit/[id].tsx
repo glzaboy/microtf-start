@@ -1,30 +1,29 @@
 import Head from 'next/head';
-import { LayoutDefault } from '@/components/Layout';
+import { Layout } from '@/components/layout';
 import dynamic from 'next/dynamic';
 import { useState, useCallback, useEffect } from 'react';
 import {
   Button,
-  Form,
-  Input,
   Card,
-  Select,
-  Message,
-  Space,
-} from '@arco-design/web-react';
+  CardActions,
+  TextField,
+  FormControl,
+  Container,
+} from '@mui/material';
+import { useFormik } from 'formik';
 import WebLink from '@/components/base/WebLink';
-import { requestMsg } from '@/utils/request';
+import { requestMsg } from '@/components/server/utils/request';
 import formLocale from '@/locale/form';
 import postLocale from '@/locale/post';
-import useLocale, { useLocaleName } from '@/utils/useLocale';
+import useLocale, { useLocaleName } from '@/components/utils/useLocale';
 
-import type { Data as CatData } from '@/pages/api/post/categories/list';
 const DynamicEditor = dynamic(() => import('@/components/Editor'), {
   ssr: false,
 });
-import { Category } from '@prisma/client';
 import { useRouter } from 'next/router';
 import { Data as PostData } from '@/pages/api/post/get';
-import { Data as EditData } from '@/pages/api/post/edit';
+import { Data as EditData, InputDate } from '@/pages/api/post/edit';
+import CategorySelect from '@/components/CategorySelect';
 
 export default function Index() {
   const router = useRouter();
@@ -34,45 +33,45 @@ export default function Index() {
 
   const [html, setHtml] = useState<string>('');
   const [id, setId] = useState<number>(0);
-  const [form] = Form.useForm();
-
-  const [categories, setCategories] = useState<Category[]>([]);
-  const fetchCatCallBack = useCallback(() => {
-    const fetchCatData = (page: number, size: number) => {
-      requestMsg<CatData>('/api/post/categories/list', {
+  const formIk = useFormik<InputDate>({
+    initialValues: {
+      id: 0,
+      categoryId: [],
+      content: '',
+      title: '',
+    },
+    onSubmit: (values) => {
+      requestMsg<EditData>('/api/post/edit', {
         method: 'post',
-        data: { page, size, catId: 1 },
-        lang,
+        data: values,
       }).then((res) => {
-        setCategories(res.categories || []);
+        if (id === 0) {
+          setId(res.id);
+        }
       });
-    };
-    fetchCatData(1, 100);
-  }, [lang]);
-  useEffect(() => {
-    fetchCatCallBack();
-  }, [fetchCatCallBack]);
+    },
+  });
+
   useEffect(() => {
     if (id <= 0) {
       return;
     }
-    console.log(id);
     requestMsg<PostData>('/api/post/get', {
       method: 'get',
       params: { id },
       lang,
     }).then((res) => {
-      form.setFieldValue('id', res.id);
-      form.setFieldValue('title', res.title);
-      form.setFieldValue('content', res.content);
+      formIk.setFieldValue('id', res.id);
+      formIk.setFieldValue('title', res.title);
+      formIk.setFieldValue('content', res.content);
       setHtml(res.content ?? '');
       const catMap: number[] = [];
       res.categories?.forEach((item) => {
         catMap.push(item.categoryId);
       });
-      form.setFieldValue('categoryId', catMap);
+      formIk.setFieldValue('categoryId', catMap);
     });
-  }, [id, lang, form]);
+  }, [id, lang]);
   useEffect(() => {
     const { id: queryId } = router.query;
     if (typeof queryId != 'string') {
@@ -84,23 +83,8 @@ export default function Index() {
     setId(parseInt(queryId));
   }, [router.query]);
   function onSubmitClick() {
-    form.setFieldValue('content', html);
-    form
-      .validate()
-      .then((values) => {
-        requestMsg<EditData>('/api/post/edit', {
-          method: 'post',
-          data: values,
-        }).then((res) => {
-          if (id === 0) {
-            setId(res.id);
-          }
-          Message.info('保存成功，您可以继续编辑');
-        });
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+    formIk.setFieldValue('content', html);
+    formIk.handleSubmit();
   }
   return (
     <>
@@ -111,59 +95,76 @@ export default function Index() {
           href="https://unpkg.byted-static.com/latest/byted/arco-config/assets/favicon.ico"
         />
       </Head>
-      <div>
+      <Container maxWidth="xl">
         <Card>
-          <Form layout="vertical" form={form}>
-            <Form.Item label="ID" field="id" hidden={true}>
-              <Input />
-            </Form.Item>
-            <Form.Item label={postL['post.title']} field="title">
-              <Input />
-            </Form.Item>
-            <Form.Item
-              label={postL['post.category.field.name']}
-              field="categoryId"
-            >
-              <Select allowClear mode="multiple">
-                {categories &&
-                  categories.map((value) => {
-                    return (
-                      <Select.Option value={value.id} key={value.id}>
-                        {value.cat}
-                      </Select.Option>
-                    );
-                  })}
-              </Select>
-            </Form.Item>
-            <Form.Item field="content" hidden={true}>
-              <Input />
-            </Form.Item>
-            <Form.Item>
+          <form onSubmit={formIk.handleSubmit}>
+            <FormControl fullWidth>
+              <TextField
+                variant={'standard'}
+                name="id"
+                id="id"
+                label={postL['post.category.field.name']}
+                placeholder={postL['post.category.field.name']}
+                fullWidth
+                value={formIk.values.id}
+                onChange={(e) => formIk.handleChange(e)}
+              ></TextField>
+            </FormControl>
+            <FormControl fullWidth>
+              <TextField
+                variant={'standard'}
+                name="title"
+                id="title"
+                label={postL['post.title']}
+                placeholder={postL['post.title']}
+                fullWidth
+                value={formIk.values.title}
+                onChange={(e) => formIk.handleChange(e)}
+              ></TextField>
+            </FormControl>
+            <FormControl>
+              <CategorySelect
+                selectedVlues={[16, 14]}
+                onClose={() => {}}
+              ></CategorySelect>
+            </FormControl>
+            <FormControl fullWidth>
+              <TextField
+                variant={'standard'}
+                name="content"
+                id="content"
+                fullWidth
+                value={formIk.values.content}
+                onChange={(e) => formIk.handleChange(e)}
+              ></TextField>
+            </FormControl>
+            <FormControl fullWidth>
               <DynamicEditor
                 html={html}
                 setHtml={setHtml}
                 lang={lang}
               ></DynamicEditor>
-            </Form.Item>
-            <Space>
-              <Button type="primary" onClick={onSubmitClick}>
-                {formL['save']}
-              </Button>
-              <WebLink
-                handleClick={() => {
-                  router.push({
-                    pathname: '/post/list',
-                  });
-                }}
-                confirmText={formL['confirm']}
-              >
-                {formL['back']}
-              </WebLink>
-            </Space>
-          </Form>
+            </FormControl>
+          </form>
+          <CardActions>
+            <Button color="primary" variant={'text'} onClick={onSubmitClick}>
+              {formL['save']}
+            </Button>
+            <WebLink
+              handleClick={() => {
+                router.push({
+                  pathname: '/admin/post/list',
+                });
+              }}
+              confirmText={formL['confirm']}
+              link={{ underline: 'none', variant: 'button' }}
+            >
+              {formL['back']}
+            </WebLink>
+          </CardActions>
         </Card>
-      </div>
+      </Container>
     </>
   );
 }
-Index.Layout = LayoutDefault;
+Index.Layout = Layout;
