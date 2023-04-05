@@ -35,7 +35,7 @@ export default function Login() {
     onSubmit: (values) => {
       requestMsg<response>('/api/login', { method: 'post', data: values })
         .then(() => {
-          router.push('/');
+          router.push('/admin/post/list');
         })
         .catch((err) => {
           message.error(err);

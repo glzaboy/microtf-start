@@ -4,7 +4,6 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  Button,
   DialogContentText,
 } from '@mui/material';
 import { ReactNode, useState } from 'react';
@@ -52,11 +51,14 @@ const WebLink = ({
             <DialogContentText>{confirmText}</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color={'secondary'}>
+            <WebLink
+              handleClick={handleClose}
+              link={{ underline: 'none', color: 'secondary' }}
+            >
               取消
-            </Button>
-            <Button
-              onClick={() => {
+            </WebLink>
+            <WebLink
+              handleClick={() => {
                 if (handleClick) {
                   handleClick();
                 }
@@ -67,11 +69,10 @@ const WebLink = ({
                   });
                 }
               }}
-              autoFocus
-              color={'warning'}
+              link={{ color: 'primary', underline: 'none' }}
             >
               确定
-            </Button>
+            </WebLink>
           </DialogActions>
         </Dialog>
       </>

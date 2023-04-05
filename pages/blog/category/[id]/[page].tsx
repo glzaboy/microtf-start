@@ -33,7 +33,7 @@ export default function Index({
             <Card style={{ minHeight: '450px' }}>
               <CardContent>
                 <Typography component={'h2'}>{data?.catName}</Typography>
-                {data?.posts?.length &&
+                {data?.posts &&
                   data?.posts.map((val, _index) => {
                     return (
                       <>
@@ -63,7 +63,6 @@ export default function Index({
 Index.Layout = Layout;
 export const getServerSideProps: GetServerSideProps<{
   data?: Data;
-  htmlContent?: string;
 }> = async (context) => {
   const { id, page } = context.query;
   if (typeof id === 'string') {

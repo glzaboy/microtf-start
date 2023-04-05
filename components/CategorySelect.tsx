@@ -2,20 +2,16 @@ import { useState, useCallback, useEffect, forwardRef } from 'react';
 import {
   Dialog,
   DialogTitle,
-  List,
   DialogContent,
   Checkbox,
-  FormGroup,
+  Stack,
   FormControlLabel,
   Slide,
   DialogActions,
   Button,
   FormControl,
-  InputLabel,
-  Select,
-  Box,
   Chip,
-  MenuItem,
+  Box,
 } from '@mui/material';
 import { requestMsg } from '@/components/server/utils/request';
 import { Category } from '@prisma/client';
@@ -34,10 +30,15 @@ const Transition = forwardRef(function Transition(
 });
 
 const CategorySelect = ({
-  selectedVlues,
+  selectedValues,
   title,
+  onResult,
 }: {
-  selectedVlues: Array<string | number>;
+  selectedValues:
+    | Array<string>
+    | Array<number>
+    | (() => Promise<(number | string)[]>)
+    | undefined;
   title?: string;
   onResult: (values: Array<string | number>) => void;
 }) => {
@@ -45,6 +46,21 @@ const CategorySelect = ({
   const lang = useLocaleName();
   const formL = useLocale(formLocale);
   const [categories, setCategories] = useState<Category[]>([]);
+  const initSelect = useCallback(() => {
+    if (typeof selectedValues === 'function') {
+      selectedValues().then((selectData) => {
+        setSelectCategories(selectData.slice(0));
+        setUiCategories(selectData.slice(0));
+        alert(selectData.slice(0));
+      });
+    } else if (selectedValues) {
+      setSelectCategories(selectedValues.slice(0));
+      setUiCategories(selectedValues.slice(0));
+    } else {
+      setSelectCategories([]);
+      setUiCategories([]);
+    }
+  }, [selectedValues]);
   const fetchCatCallBack = useCallback(() => {
     const fetchCatData = (page: number, size: number) => {
       requestMsg<CatData>('/api/post/categories/list', {
@@ -53,94 +69,117 @@ const CategorySelect = ({
         lang,
       }).then((res) => {
         setCategories(res.categories || []);
+        initSelect();
       });
     };
     fetchCatData(1, 100);
-  }, [lang]);
+  }, [lang, initSelect]);
+
   useEffect(() => {
     fetchCatCallBack();
   }, [fetchCatCallBack]);
-  const [selectCategories, setSelectCategories] =
-    useState<Array<string | number>>(selectedVlues);
+  useEffect(() => {
+    initSelect();
+  }, [selectedValues, initSelect]);
+  const [selectCategories, setSelectCategories] = useState<
+    Array<string | number>
+  >([]);
+  const [uiCategories, setUiCategories] = useState<Array<string | number>>([]);
+
   const openSelect = () => {
     setOpen(true);
+    initSelect();
   };
 
   const handleChange = (action: string, value: string | number) => {
     if (action == 'add') {
       selectCategories.push(value);
-      setSelectCategories(selectCategories);
+      setSelectCategories(selectCategories.slice(0));
     }
     if (action == 'remove') {
       setSelectCategories(selectCategories.filter((item) => item !== value));
     }
   };
-  const handleClose = () => {
+  const handleOk = () => {
     setOpen(false);
+    onResult(selectCategories);
+    setUiCategories(selectCategories.slice(0));
   };
 
   return (
     <>
-      <Dialog
-        sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
-        open={open}
-        TransitionComponent={Transition}
-      >
-        <DialogTitle>{title}</DialogTitle>
+      <Box sx={{ m: 1, verticalAlign: 'center' }}>
+        <Dialog
+          sx={{ '& .MuiDialog-paper': { width: '80%', maxHeight: 435 } }}
+          open={open}
+          TransitionComponent={Transition}
+        >
+          <DialogTitle>{title}</DialogTitle>
 
-        <DialogContent dividers>
-          <FormControl sx={{ m: 1, minWidth: 120 }}>
-            {categories &&
-              categories.map((value) => {
-                return (
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        size={'small'}
-                        value={value.id}
-                        onChange={(event) => {
-                          if (!event.target.checked) {
-                            handleChange('remove', value.id);
-                          } else {
-                            handleChange('add', value.id);
-                          }
-                        }}
-                        checked={selectCategories.includes(value.id)}
-                      />
-                    }
-                    key={value.id}
-                    label={value.cat}
-                  ></FormControlLabel>
-                );
-              })}
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
+          <DialogContent dividers>
+            <FormControl sx={{ m: 1, minWidth: 120 }}>
+              {categories &&
+                categories.map((value) => {
+                  return (
+                    <FormControlLabel
+                      control={
+                        <Checkbox
+                          size={'small'}
+                          value={value.id}
+                          onChange={(event) => {
+                            if (!event.target.checked) {
+                              handleChange('remove', value.id);
+                            } else {
+                              handleChange('add', value.id);
+                            }
+                          }}
+                          checked={selectCategories.includes(value.id)}
+                        />
+                      }
+                      key={value.id}
+                      label={value.cat}
+                    ></FormControlLabel>
+                  );
+                })}
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              onClick={() => {
+                setOpen(false);
+              }}
+            >
+              {formL['close']}
+            </Button>
+            <Button onClick={handleOk}>{formL['ok']}</Button>
+          </DialogActions>
+        </Dialog>
+
+        <Stack direction="row" spacing={1}>
           <Button
             onClick={() => {
-              setOpen(false);
+              openSelect();
             }}
           >
-            {formL['close']}
+            选择
           </Button>
-          <Button onClick={handleClose}>{formL['ok']}</Button>
-        </DialogActions>
-      </Dialog>
-      <Button
-        onClick={() => {
-          openSelect();
-        }}
-      >
-        选择
-      </Button>
-      {categories &&
-        categories.map((value) => {
-          if (selectCategories.includes(value.id)) {
-            return (
-              <Chip key={value.id} label={value.cat} variant="outlined"></Chip>
-            );
-          }
-        })}
+          {categories &&
+            categories.map((value) => {
+              if (uiCategories.includes(value.id)) {
+                return (
+                  <Chip
+                    key={value.id}
+                    label={value.cat}
+                    variant="outlined"
+                    sx={{ display: 'inline' }}
+                    component={'span'}
+                    size="small"
+                  ></Chip>
+                );
+              }
+            })}
+        </Stack>
+      </Box>
     </>
   );
 };

@@ -1,7 +1,7 @@
 import Head from 'next/head';
 import { Layout } from '@/components/layout';
 import dynamic from 'next/dynamic';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Button,
   Card,
@@ -98,13 +98,11 @@ export default function Index() {
       <Container maxWidth="xl">
         <Card>
           <form onSubmit={formIk.handleSubmit}>
-            <FormControl fullWidth>
+            <FormControl fullWidth sx={{ display: 'none' }}>
               <TextField
                 variant={'standard'}
                 name="id"
                 id="id"
-                label={postL['post.category.field.name']}
-                placeholder={postL['post.category.field.name']}
                 fullWidth
                 value={formIk.values.id}
                 onChange={(e) => formIk.handleChange(e)}
@@ -122,13 +120,16 @@ export default function Index() {
                 onChange={(e) => formIk.handleChange(e)}
               ></TextField>
             </FormControl>
-            <FormControl>
+            <FormControl fullWidth>
               <CategorySelect
-                selectedVlues={[16, 14]}
-                onClose={() => {}}
+                selectedValues={formIk.values.categoryId}
+                onResult={(data) => {
+                  formIk.setFieldValue('categoryId', data);
+                }}
+                title={'类目选择'}
               ></CategorySelect>
             </FormControl>
-            <FormControl fullWidth>
+            <FormControl fullWidth sx={{ display: 'none' }}>
               <TextField
                 variant={'standard'}
                 name="content"
@@ -157,7 +158,11 @@ export default function Index() {
                 });
               }}
               confirmText={formL['confirm']}
-              link={{ underline: 'none', variant: 'button' }}
+              link={{
+                underline: 'none',
+                variant: 'button',
+                color: 'secondary',
+              }}
             >
               {formL['back']}
             </WebLink>
