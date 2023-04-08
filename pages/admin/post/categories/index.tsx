@@ -1,4 +1,4 @@
-import { Layout } from '@/components/layout';
+import { AdminLayout } from '@/components/layout';
 import Head from 'next/head';
 import postLocale from '@/locale/post';
 import formLocale from '@/locale/form';
@@ -197,6 +197,7 @@ export default function Index() {
                 justifyContent="flex-end"
                 alignItems="center"
                 spacing={0.5}
+                sx={{ m: 2 }}
               >
                 <WebLink
                   handleClick={() =>
@@ -214,7 +215,7 @@ export default function Index() {
                 </WebLink>
               </Stack>
             </Grid>
-            <Grid item={true} md={24} xs={24} sm={24}>
+            <Grid item={true} md={12} xs={12} sm={12}>
               <Card>
                 <List>
                   {data &&
@@ -225,9 +226,7 @@ export default function Index() {
                           spacing={2}
                           justifyContent="space-between"
                         >
-                          <Paper>
-                            <Typography>{item.cat}</Typography>
-                          </Paper>
+                          <Typography>{item.cat}</Typography>
                           <Paper>
                             <WebLink
                               pathname="/post/category/edit/"
@@ -278,4 +277,4 @@ export default function Index() {
     </>
   );
 }
-Index.Layout = Layout;
+Index.Layout = AdminLayout;

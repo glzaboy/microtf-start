@@ -1,4 +1,4 @@
-import { Layout } from '@/components/layout';
+import { AdminLayout } from '@/components/layout';
 import Head from 'next/head';
 import {
   Grid,
@@ -151,4 +151,4 @@ export default function Index() {
     </>
   );
 }
-Index.Layout = Layout;
+Index.Layout = AdminLayout;
