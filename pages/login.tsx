@@ -12,25 +12,32 @@ import {
   useTheme,
   useMediaQuery,
   Box,
-  Stack,
 } from '@mui/material';
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next';
 import { requestMsg } from '@/components/server/utils/request';
 import { useFormik } from 'formik';
 import message from '@/components/base/Message';
 import * as yup from 'yup';
 import type { response } from '@/components/server/dto/response';
 import { useRouter } from 'next/router';
+import getImage from '@/components/server/bingImage';
 
-export default function Login() {
+export default function Login({
+  data,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const router = useRouter();
   const theme = useTheme();
-  const matches = useMediaQuery(theme.breakpoints.down('sm'));
+  const matches = useMediaQuery(theme.breakpoints.down('md'));
   const validationSchema = yup.object({
     name: yup.string().required('用户名不能为空'),
     password: yup.string().required('密码不能为空'),
   });
-  const formik = useFormik({
-    initialValues: { name: 'abc', password: '', loginType: 'PASSWORD' },
+  const formik = useFormik<{
+    name: string;
+    password: string;
+    loginType: string;
+  }>({
+    initialValues: { name: '', password: '', loginType: 'PASSWORD' },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       requestMsg<response>('/api/login', { method: 'post', data: values })
@@ -50,7 +57,13 @@ export default function Login() {
       <Head>
         <title>{'登录'}</title>
       </Head>
-      <Container maxWidth="xl">
+      <Container
+        maxWidth="xl"
+        sx={{
+          minHeight: matches ? 0 : 650,
+          backgroundImage: matches ? null : "url('" + data.background + "')",
+        }}
+      >
         <Grid container spacing={2}>
           <Grid item={true} xs={12}>
             <Box
@@ -131,16 +144,24 @@ export default function Login() {
                   </form>
                 </CardContent>
                 <CardActions sx={{ textAlign: 'right' }}>
-                  <Stack>
-                    <Button
-                      onClick={() => {
-                        formik.submitForm();
-                      }}
-                      sx={{ float: 'right' }}
-                    >
-                      登录
-                    </Button>
-                  </Stack>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      formik.submitForm();
+                    }}
+                    fullWidth
+                  >
+                    登录
+                  </Button>
+                  <Button
+                    type="submit"
+                    onClick={() => {
+                      message.info('请直接联系站长');
+                    }}
+                    fullWidth
+                  >
+                    注册
+                  </Button>
                 </CardActions>
               </Card>
             </Box>
@@ -151,3 +172,9 @@ export default function Login() {
   );
 }
 Login.Layout = Layout;
+export const getServerSideProps: GetServerSideProps<{
+  data: { background: string };
+}> = async () => {
+  const a = await getImage();
+  return { props: { data: { background: a } } };
+};

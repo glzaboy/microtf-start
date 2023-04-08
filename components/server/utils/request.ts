@@ -41,6 +41,7 @@ interface IRequestOptions extends AxiosRequestConfig {
   withCookie?: Partial<{
     [key: string]: string;
   }>;
+  checkCode?: boolean;
 }
 
 interface IRequest {
@@ -52,7 +53,7 @@ interface IRequest {
 
 const request: IRequest = (
   url: string,
-  opts: IRequestOptions = { method: 'GET' }
+  opts: IRequestOptions = { method: 'GET', checkCode: true }
 ) => {
   const t = getLocaleTable(requestLocale, opts.lang || 'zh-CN');
   const headers = opts.headers || {};
@@ -81,7 +82,7 @@ const request: IRequest = (
       .request({ ...opts, headers: headers, url })
       .then((res) => {
         const data = res.data;
-        if (data.code != 0) {
+        if (opts.checkCode && data.code != 0) {
           reject(data.msg);
         }
         resolve(res.data);
@@ -110,7 +111,7 @@ const request: IRequest = (
  */
 const requestMsg: IRequest = (
   url: string,
-  opts: IRequestOptions = { method: 'GET' }
+  opts: IRequestOptions = { method: 'GET', checkCode: true }
 ) => {
   const t = getLocaleTable(requestLocale, opts.lang || 'zh-CN');
   const requestInstance = getRequestInstance();
